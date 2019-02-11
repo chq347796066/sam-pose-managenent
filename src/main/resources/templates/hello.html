@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>hello</title>
+</head>
+<body>
+
+<p th:text="${name}"></p>
+<p th:text="${user.id}"></p>
+<p th:text="${user.name}"></p>
+<p th:text="${user.age}"></p>
+
+
+<div th:switch="${user.id}">
+    <p th:case="'1'">阿飞</p>
+    <p th:case="'2'">李寻欢</p>
+</div>
+
+<table th:height="100" th:width="100" >
+    <tr >
+        <th>ID</th>
+        <th>NAME</th>
+        <th>AGE</th>
+    </tr>
+    <tr th:each="prod : ${list}">
+        <td th:text="${prod.id}">Onions</td>
+        <td th:text="${prod.name}">2.41</td>
+        <td th:text="${prod.age}">yes</td>
+    </tr>
+</table>
+
+
+
+</body>
+</html>

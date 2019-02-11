@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="Keywords" content="" />
+    <meta name="Description" content="" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="renderer" content="webkit" />
+    <meta
+            name="viewport"
+            content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="browsermode" content="application" />
+    <meta name="x5-page-mode" content="app" />
+    <title>login</title>
+    <link rel="stylesheet" href="front/css/style.css" />
+    <link rel="stylesheet" href="front/script/jPicker/css/jPicker-1.1.6.min.css"/>
+    <script type="text/javascript" src="front/script/jquery-1.7.1.min.js"></script>
+</head>
+<body class="login_body">
+
+<div class="login_div">
+    <div class="login_image"></div>
+    <form method="post" autocomplete="off" action="/loginUser">
+        <div class="username_div">
+            <div class="username_img"></div>
+            <div class="username_line"></div>
+            <input class="username_box" type="text" required="required" placeholder="UserName" name="userName">
+        </div>
+        <div class="password_div">
+            <div class="password_img"></div>
+            <div class="password_line"></div>
+            <input class="password_box" type="password" required="required" placeholder="Password" name="password">
+        </div>
+        <div class="error_div" th:text="${error}"></div>
+    <input type="submit" class="login_btn" value="Login" >
+    </form>
+</div>
+
+
+
+</body>
+
+</html>

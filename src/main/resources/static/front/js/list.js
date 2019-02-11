@@ -1,0 +1,4 @@
+function addEquipment() {
+    alert("add")
+    
+}

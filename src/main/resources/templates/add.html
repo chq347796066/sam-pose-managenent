@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add</title>
+</head>
+<body>
+
+
+
+<table id="table1">
+    　　<tr>
+    　　　　<td>用户名:</td>
+    　　　　<td><input type="text" name="username"></td>
+    　　</tr>
+    　　<tr>
+    　　　　<td>密码:</td>
+    　　　　<td><input type="text" name="password"></td>
+    　　</tr>
+    　　<tr>
+    　　　　<td colspan=2>
+    　　　　　　<input type="button" name="add" value="在密码行后添加一行" onclick="addTr()">
+    　　　　</td>
+    　　</tr>
+</table>
+
+<script>
+
+    function addTr(){
+        alert(12)
+        var tb=document.getElementById("table1");
+        var newTr=tb.insertRow(2);//表示在第二行后添加一行
+        var newTd=newTr.insertCell();//表示在添加的行上添加第一格
+        newTd.innerHTML="邮箱:";
+        var newTd2=newTr.insertCell();//表示在添加的行上添加第二格
+        newTd2.innerHTML="<input type='text' name='email' />";
+    }
+
+</script>
+
+</body>
+</html>
