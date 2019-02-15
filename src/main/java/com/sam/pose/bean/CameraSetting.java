@@ -29,7 +29,7 @@ public class CameraSetting implements Serializable {
 
     private String compressionRatio;
     private String vedioFps;
-    private List<Integer>colorMin;
-    private List<Integer>colorMax;
+    private Integer[]colorMin;
+    private Integer[]colorMax;
     private String storeId;
 }

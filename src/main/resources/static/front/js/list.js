@@ -1,4 +1,0 @@
-function addEquipment() {
-    alert("add")
-    
-}

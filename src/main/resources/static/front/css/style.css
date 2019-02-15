@@ -84,6 +84,8 @@ body, html{min-width: 1200px;}
 .table-list .table-box .add-box { padding-top: 50px; }
 .table-list .table-box .add-box .btn-add { display: block; width: 44px; height: 44px; background: url('../images/add.png') no-repeat center; }
 .dialog_overlay { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 5999; }
+.dialog_admin_overlay { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 6005; }
+.dialog_change_pwd_overlay { display: none; width: 100%; height: 100%; position: fixed; left: 0; top: 0; z-index: 6012; }
 .add-detail { display: none; opacity: 0; width: 640px; padding: 20px 40px 40px; background-color: #fff; position: fixed; left: 50%; top: 50%; z-index: 6000; margin: -250px 0 0 -350px; box-shadow: 0 0 15px #ccc; border-radius: 4px; transform: scale(0); -webkit-transform: scale(0); -moz-transform: scale(0); transition: all 0.5s ease; -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; }
 .add-detail .detail-title { position: relative; }
 .add-detail .detail-title h5 { line-height: 60px; font-size: 14px; color: #424242; font-weight: bold; border-bottom: 1px solid #f2f2f2; }
@@ -118,3 +120,67 @@ body, html{min-width: 1200px;}
 .password_box {padding-left:10px;width: 425px;height: 40px;position: absolute;bottom: 31px;left: 55px;background-color: rgba(25,119,211,0);font-size: 20px;color: #dee9fd}
 .error_div {width: 505px;height: 30px;position: absolute;right: 10%;top:60%;color: #1977d3;font-size: 20px;color: red}
 .result_div {text-align: center;display: none}
+
+
+.dialog_admin { display: none; opacity: 0; width: 640px; padding: 20px 40px 40px; background-color: #fff; position: fixed; left: 50%; top: 50%; z-index: 6010; margin: -250px 0 0 -350px; box-shadow: 0 0 15px #ccc; border-radius: 4px; transform: scale(0); -webkit-transform: scale(0); -moz-transform: scale(0); transition: all 0.5s ease; -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; }
+.dialog_admin .detail-title { position: relative; }
+.dialog_admin .detail-title h5 { line-height: 60px; font-size: 14px; color: #424242; font-weight: bold; border-bottom: 1px solid #f2f2f2; }
+.dialog_admin .detail-title .btn-admin-close { display: block; width: 40px; height: 40px; background: url('../images/pop_close.png') no-repeat center; position: absolute; right: 0; top: 50%; margin: -20px 0 0 0; transition: all 0.6s ease; -webkit-transition: all 0.6s ease; -moz-transition: all 0.6s ease;  }
+.dialog_admin .div_user_title {font-size: 14px; color: #808080; padding: 30px 0; }
+
+.user-table-list { margin-bottom: 30px; background-color: #fff; }
+.user-table-list .table-box .table-detail .user_name { text-align: left; }
+.user-table-list .table-box .table-detail .change_pwd { text-align: right; }
+.user-table-list .table-box .table-detail tr:nth-of-type(odd) td { background-color: #FAFAFA; }
+.user-table-list .table-box .table-detail tr {height: 40px}
+.user-table-list .table-box .table-detail tr:nth-of-type(even) td { background-color: #fff; }
+.user-table-list .table-box .table-detail .change_pwd:hover { color: #1977D3;}
+.user-table-list .add-user-box { text-align: right;height: 40px;width: 100%;margin-top: 20px;}
+.user-table-list .add-user-box .btn-add-user {display: inline-block;}
+.user-table-list .add-user-box .btn-add-user:hover {color: #1977D3}
+.user-table-list .add-user-box .btn-add-user em {display: inline-block; width: 18px; height: 18px; background: url('../images/add.png') no-repeat center; vertical-align: top; margin: 0 8px 0 0; }
+
+.dialog_change_pwd { display: none; opacity: 0;background-color: #fff; width: 500px; padding: 20px 40px 40px;  position: fixed; left: 55%; top: 60%; z-index: 6015; margin: -250px 0 0 -350px; box-shadow: 0 0 15px #ccc; border-radius: 4px; transform: scale(0); -webkit-transform: scale(0); -moz-transform: scale(0); transition: all 0.5s ease; -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; }
+.dialog_change_pwd .detail-title { position: relative; }
+.dialog_change_pwd .detail-title h5 { line-height: 60px; font-size: 14px; color: #424242; font-weight: bold; border-bottom: 1px solid #f2f2f2; }
+.dialog_change_pwd .detail-title .btn-change-pwd-close { display: block; width: 40px; height: 40px; background: url('../images/pop_close.png') no-repeat center; position: absolute; right: 0; top: 50%; margin: -20px 0 0 0; transition: all 0.6s ease; -webkit-transition: all 0.6s ease; -moz-transition: all 0.6s ease;  }
+.dialog_change_pwd .detail-title .btn-change-pwd-close:hover { transform: rotate(90deg); -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); }
+.dialog_change_pwd .detail-box .detail-list li { font-size: 14px; color: #424242; padding: 10px 0; }
+.dialog_change_pwd .detail-box .detail-list li .right-option { float: right; }
+.dialog_change_pwd .detail-box .detail-list li .right-option input { text-align: right; }
+.dialog_change_pwd .btn_change_pwd {background-color:#1977D3;text-align: center;color: #fff;padding: 10px 10px 10px 10px;margin-top: 20px;margin-right: 30%;margin-left: 30%}
+
+.dialog_general_change_pwd { display: none; opacity: 0;background-color: #fff; width: 500px; padding: 20px 40px 40px;  position: fixed; left: 55%; top: 60%; z-index: 6015; margin: -250px 0 0 -350px; box-shadow: 0 0 15px #ccc; border-radius: 4px; transform: scale(0); -webkit-transform: scale(0); -moz-transform: scale(0); transition: all 0.5s ease; -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; }
+.dialog_general_change_pwd .detail-title { position: relative; }
+.dialog_general_change_pwd .detail-title h5 { line-height: 60px; font-size: 14px; color: #424242; font-weight: bold; border-bottom: 1px solid #f2f2f2; }
+.dialog_general_change_pwd .detail-title .btn-general-change-pwd-close { display: block; width: 40px; height: 40px; background: url('../images/pop_close.png') no-repeat center; position: absolute; right: 0; top: 50%; margin: -20px 0 0 0; transition: all 0.6s ease; -webkit-transition: all 0.6s ease; -moz-transition: all 0.6s ease;  }
+.dialog_general_change_pwd .detail-title .btn-general-change-pwd-close:hover { transform: rotate(90deg); -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); }
+.dialog_general_change_pwd .detail-box .detail-list li { font-size: 14px; color: #424242; padding: 10px 0; }
+.dialog_general_change_pwd .detail-box .detail-list li .right-option { float: right; }
+.dialog_general_change_pwd .detail-box .detail-list li .right-option input { text-align: right; }
+.dialog_general_change_pwd .btn_general_change_pwd {background-color:#1977D3;text-align: center;color: #fff;padding: 10px 10px 10px 10px;margin-top: 20px;margin-right: 30%;margin-left: 30%}
+
+.dialog_add_user { display: none; opacity: 0;background-color: #fff; width: 500px; padding: 20px 40px 40px;  position: fixed; left: 55%; top: 60%; z-index: 6015; margin: -250px 0 0 -350px; box-shadow: 0 0 15px #ccc; border-radius: 4px; transform: scale(0); -webkit-transform: scale(0); -moz-transform: scale(0); transition: all 0.5s ease; -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; }
+.dialog_add_user .detail-title { position: relative; }
+.dialog_add_user .detail-title h5 { line-height: 60px; font-size: 14px; color: #424242; font-weight: bold; border-bottom: 1px solid #f2f2f2; }
+.dialog_add_user .detail-title .btn-add-user-close { display: block; width: 40px; height: 40px; background: url('../images/pop_close.png') no-repeat center; position: absolute; right: 0; top: 50%; margin: -20px 0 0 0; transition: all 0.6s ease; -webkit-transition: all 0.6s ease; -moz-transition: all 0.6s ease;  }
+.dialog_add_user .detail-title .btn-add-user-close:hover { transform: rotate(90deg); -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); }
+.dialog_add_user .detail-box .detail-list li { font-size: 14px; color: #424242; padding: 10px 0; }
+.dialog_add_user .detail-box .detail-list li .right-option { float: right; }
+.dialog_add_user .detail-box .detail-list li .right-option input { text-align: right; }
+.dialog_add_user .btn_add_user {background-color:#1977D3;text-align: center;color: #fff;padding: 10px 10px 10px 10px;margin-top: 20px;margin-right: 30%;margin-left: 30%}
+
+.dialog_cam_management { display: none; opacity: 0; width: 800px; padding: 20px 40px 40px; background-color: #fff; position: fixed; left: 50%; top: 50%; z-index: 6010; margin: -250px 0 0 -350px; box-shadow: 0 0 15px #ccc; border-radius: 4px; transform: scale(0); -webkit-transform: scale(0); -moz-transform: scale(0); transition: all 0.5s ease; -webkit-transition: all 0.5s ease; -moz-transition: all 0.5s ease; }
+.dialog_cam_management .detail-title { position: relative; }
+.dialog_cam_management .detail-title h5 { line-height: 60px; font-size: 14px; color: #424242; font-weight: bold; border-bottom: 1px solid #f2f2f2; }
+.dialog_cam_management .detail-title .btn-cam-close { display: block; width: 40px; height: 40px; background: url('../images/pop_close.png') no-repeat center; position: absolute; right: 0; top: 50%; margin: -20px 0 0 0; transition: all 0.6s ease; -webkit-transition: all 0.6s ease; -moz-transition: all 0.6s ease;  }
+.dialog_cam_management .div_cam_title {font-size: 14px; color: #808080; padding: 30px 0; }
+.dialog_cam_management .table-box .table-detail th { font-weight: normal; background-color: #E6E6E6; }
+.dialog_cam_management .table-box .table-detail tr { height: 35px }
+.dialog_cam_management .table-box .table-detail td { text-align: center }
+.dialog_cam_management .table-box .table-detail  em{display: inline-block; width: 30px; height: 30px; background: url('../images/edit.png') no-repeat center; vertical-align: top; margin: 0 8px 0 0; }
+.dialog_cam_management .add-cam-box { text-align: right;height: 40px;width: 100%;margin-top: 20px;}
+.cam-table-list .add-cam-box .btn-add-cam {display: inline-block;}
+.cam-table-list .add-cam-box .btn-add-cam:hover {color: #1977D3}
+.cam-table-list .add-cam-box .btn-add-cam em {display: inline-block; width: 18px; height: 18px; background: url('../images/add.png') no-repeat center; vertical-align: top; margin: 0 8px 0 0; }
+

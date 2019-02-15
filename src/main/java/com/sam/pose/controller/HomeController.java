@@ -1,6 +1,5 @@
 package com.sam.pose.controller;
 
-import com.google.gson.Gson;
 import com.sam.pose.bean.*;
 import com.sam.pose.dao.AlertInfoRepository;
 import com.sam.pose.dao.StoreInfoRepository;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -25,34 +23,24 @@ public class HomeController {
     @Autowired
     private CameraSettingService cameraSettingService;
 
+    private boolean isFirst=true;
+
+    private List<StoreInfo>storeInfos;
+    private List<AlertInfo>alertInfos;
     @RequestMapping("/home")
     public String home(Model model){
-        List<StoreInfo>storeInfos=(List<StoreInfo>) storeInfoRepository.findAll();
-        List<AlertInfo>alertInfos=(List<AlertInfo>) alertInfoRepository.findAll();
-        model.addAttribute("storeInfos",storeInfos);
-        model.addAttribute("alertInfos",alertInfos);
+        System.out.println(isFirst);
+        if(isFirst) {
+            storeInfos = (List<StoreInfo>) storeInfoRepository.findAll();
+            alertInfos = (List<AlertInfo>) alertInfoRepository.findAll();
+            isFirst=false;
+        }
+        model.addAttribute("storeInfos", storeInfos);
+        model.addAttribute("alertInfos", alertInfos);
         return "ListPage";
     }
 
-    @RequestMapping(value = "/settingTest")
-    @ResponseBody
-    public String settingTest(){
-        //CameraSetting(settingId=1, cameraId=111, partitionId=store_6372_111, compressionRatio=0.3, vedioFps=10, colorMin=null, colorMax=null, storeId=6372)
-        List<Integer>colorMin=new ArrayList<>();
-        List<Integer>colorMax=new ArrayList<>();
-        colorMin.add(92);
-        colorMin.add(79);
-        colorMin.add(25);
-        colorMax.add(140);
-        colorMax.add(255);
-        colorMax.add(255);
 
-        CameraSetting cameraSetting=new CameraSetting("1","111","store_6372_111","0.3","10",colorMin,colorMax,"6372");
-        cameraSettingService.save(cameraSetting);
-        Iterable<CameraSetting>cameraSettings=cameraSettingService.findAll();
-        cameraSettings.forEach(t-> System.out.println(t));
-        return "success";
-    }
     @RequestMapping(value = "/setting",method = RequestMethod.POST)
     @ResponseBody
     public Result setting(SettingBean settingBean){
@@ -69,5 +57,10 @@ public class HomeController {
             cameraSettingService.save(cameraSetting);
             return new Result("0","Setting success");
         }
+    }
+
+    @RequestMapping(value = "/pose",method = RequestMethod.GET)
+    public String pose(){
+        return "openpose";
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableDocumentDbRepositories(basePackages = "com.sam.pose.dao")
 public class AppConfiguration extends AbstractDocumentDbConfiguration {
+    
 
     @Value("${azure.cosmos.db.uri}")
     private String url;

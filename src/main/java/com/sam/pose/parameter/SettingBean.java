@@ -16,6 +16,6 @@ public class SettingBean {
     private String cameraId;
     private String vedioFps;
     private String compressionRatio;
-    private List<Integer> colorMin;
-    private List<Integer> colorMax;
+    private Integer[] colorMin;
+    private Integer[] colorMax;
 }

@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>openpose</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body,html {
+      height: 100%;
+      margin: 0;
+    }
+    ul,li {
+      list-style: none;
+      padding-left: 0;
+    }
+    figure {
+      margin: 0;
+    }
+    .label {
+      vertical-align: top;
+      margin-right: 15px;
+    }
+	.header-box {
+	  height: 70px;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,.12);
+      background-color: #fff;
+	}
+	.header-box .logo-box {
+	  padding: 20px 0;
+	  margin: 0 0 0 40px;
+	}
+	.header-box .logo-box img {
+	  width: 162px;
+      height: 30px;
+	}
+    .operate {
+      float: left;
+      width: 50%;
+      height: 89%;
+      border-right: 2px solid #d0d0d0;
+    }
+    .result {
+      height: 89%;
+      margin-left: 50%;
+    }
+    .query-item {
+      display: flex;
+    }
+    .query-item-url {
+      height: 30px;
+    }
+    .query-item-url, .query-item-box {
+      flex-grow: 1;
+    }
+    .query-item-button {
+      text-align: center;
+    }
+    .title {
+      margin: 0;
+      padding: 10px 40px;
+      background-color: #154281;
+      color: #fff;
+    }
+    .query-list {
+      margin: 0;
+    }
+	.result-list {
+	  float: left;
+	  width: 40%;
+	  height: 80%;
+	  overflow: hidden;
+      padding: 35px 40px;
+	  margin: 0;
+	  border-left: 1px dashed #d0d0d0;
+	}
+	.result-list li{
+      background-color: #e1e1e1;
+      text-align: center;
+      margin: 0 0 20px;
+      padding: 10px 20px;
+	}
+    .img-container {
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+    .img-figure {
+      display: inline-block;
+      position: relative;
+      font-size: 0;
+    }
+    .target {
+      max-width: 100%;
+    }
+    .box {
+      position: absolute;
+      background: transparent;
+      border: 2px solid red;
+    }
+    .btn-query {
+	  color: #fff;
+      padding: 15px 40px;
+	  border: none;
+	  background: #154281;
+    }
+	.content-holder {
+	  margin: 10px auto;
+	}
+	.footer{
+      background-color: #154281;
+	}
+	.powered {
+	  line-height: 36px;
+      font-size: 16px;
+      color: #fff;
+      text-align: center;
+	  margin: 0;
+	}
+    .result-wrapper {
+	  height: 100%;
+	  overflow: hidden;
+	}
+	.img-container {
+	  width: 100%;
+    height: 100%;
+    text-align: left;
+	}
+  </style>
+</head>
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+        var host = "ws://127.0.0.1:8081/"
+        socket = new WebSocket(host);
+        try {
+
+            socket.onopen = function (msg) {
+              console.log("连接成功！")
+                //向服务端发送消息
+              //socket.send("message")
+                
+            };
+
+            socket.onmessage = function (msg) {
+                if (typeof msg.data == "string") {
+                    var obj = JSON.parse(msg.data);
+                    if (obj.type== 1)
+                      $("#image").attr("src",obj.image);
+                    if (obj.type== 2){
+                       console.log(obj);
+                       var html = "<img style='margin:1px;' src='" + obj.image + " ' width='214px' height='120px'/>";
+                       $("#showImage").append(html);
+                    }
+                      
+                }
+                else {
+                    alert("非文本消息");
+                }
+            };
+
+            socket.onclose = function (msg) { 
+              console.log("socket closed!") 
+              //window.location.reload();
+            };
+        }
+        catch (ex) {
+            console.log(ex);
+        }
+        });
+    </script>
+<body>
+  <div class="header-box">
+	<div class="logo-box">
+	  <a href="#">
+	    <img src="head.png" alt="" />
+	  </a>
+	</div>
+  </div>
+  <aside class="operate">
+      <ul class="query-list">
+        <li class="query-item url">
+         <div class="content-holder" id="contentHolder">
+           <img src="" id="image"/>
+    </div>
+        </li>
+		  <li class="query-item data"></li>
+        <li class="query-item-button">
+          <button class="btn-query" id="snap" type="submit">video</button>
+        </li>
+      </ul>
+  </aside>
+  <section class="result">
+	<div class="result-wrapper">
+		<div class="img-container">
+			<div class="boxes" style="margin:20px;overflow-y:scroll; overflow-x:scroll;height: 100%;" id="showImage" >
+      </div>
+    </div>
+  </section>
+  <footer class="footer"><p class="powered">Powered by ProductAI®</p></footer>
+</body>
+</html>
