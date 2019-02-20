@@ -22,7 +22,15 @@ import java.io.Serializable;
 public class CameraInfo implements Serializable {
     @Id
     private String cameraId;
-    private String storeId;
+    private String clubId;
     @PartitionKey
     private String partitionId;
+    private String compressionRatio;
+    private String vedioFps;
+    private Integer[]colorMin;
+    private Integer[]colorMax;
+    private String cameraName;
+    private String resourceId;
+    private String idName;//方便查看,storeId_resourceId
+    private String isMonitor;//0为不监控，1为监控
 }

@@ -1,9 +1,9 @@
 package com.sam.pose.server;
 
-import com.sam.pose.bean.StoreInfo;
+import com.sam.pose.bean.ClubInfo;
 
 
 public interface StoreService {
-    Iterable<StoreInfo>findAll();
-    void save(StoreInfo storeInfo);
+    Iterable<ClubInfo>findAll();
+    void save(ClubInfo storeInfo);
 }

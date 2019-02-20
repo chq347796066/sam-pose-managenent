@@ -34,6 +34,9 @@ public class LoginController {
 
     @RequestMapping(value = "/loginUser",method = RequestMethod.POST)
     public String login(String userName,String password,HttpSession session,RedirectAttributes rAttributes){
+
+
+
         UserInfo userInfo=userService.findByUserName(userName);
         if(userInfo==null){
             rAttributes.addFlashAttribute("error","Account does not exist");

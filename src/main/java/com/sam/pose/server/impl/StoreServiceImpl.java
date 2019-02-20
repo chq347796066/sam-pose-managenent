@@ -1,7 +1,7 @@
 package com.sam.pose.server.impl;
 
-import com.sam.pose.bean.StoreInfo;
-import com.sam.pose.dao.StoreInfoRepository;
+import com.sam.pose.bean.ClubInfo;
+import com.sam.pose.dao.ClubInfoRepository;
 import com.sam.pose.server.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 public class StoreServiceImpl implements StoreService {
 
     @Autowired
-    private StoreInfoRepository storeInfoRepository;
+    private ClubInfoRepository storeInfoRepository;
     @Override
-    public Iterable<StoreInfo> findAll() {
+    public Iterable<ClubInfo> findAll() {
         return storeInfoRepository.findAll();
     }
 
     @Override
-    public void save(StoreInfo storeInfo) {
+    public void save(ClubInfo storeInfo) {
         storeInfoRepository.save(storeInfo);
     }
 

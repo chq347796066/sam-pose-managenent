@@ -10,4 +10,5 @@ import java.util.List;
 public interface UserInfoRepository extends DocumentDbRepository<UserInfo,String> {
     List<UserInfo> findByUserId(String userId);
     List<UserInfo> findByUserName(String userName);
+    List<UserInfo>findByUserCharacter(String userCharacter);
 }

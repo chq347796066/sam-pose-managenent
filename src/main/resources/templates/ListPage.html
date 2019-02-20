@@ -21,49 +21,101 @@
     <script type="text/javascript" src="front/script/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="front/script/jPicker/jpicker-1.1.6.js"></script>
     <script type="text/javascript" src="front/js/color.js"></script>
+
     <script>
-        $(document).ready(function () {
-            var host = "ws://127.0.0.1:8081/"
-            socket = new WebSocket(host);
-            try {
+        //加载前端界面数据
+        function getData() {
+            //加载已监控的数据
+            getMCam();
+            //加载alertlist的数据
+            getAlert();
 
-                socket.onopen = function (msg) {
-                    console.log("连接成功！")
-                    //向服务端发送消息
-                    //socket.send("message")
-
-                };
-
-                socket.onmessage = function (msg) {
-                    if (typeof msg.data == "string") {
-                        var obj = JSON.parse(msg.data);
-                        if (obj.type== 1)
-                            $("#image").attr("src",obj.image);
-                        if (obj.type== 2){
+        }
+        function getMCam() {
+            var curl="/findMCamera";
+            $.ajax({
+                type: "post",
+                url: curl,
+                success: function (result) {
+                    if(result!= null){
+                        var result = eval(result);
+                        var table_html = "<tr >\n" +
+                            "                    <th width=\"150\">Club</th>\n" +
+                            "                        <th>Resource Id</th>\n" +
+                            "                    <th>Camera Name</th>\n" +
+                            "                    <th></th>\n" +
+                            "                    </tr>";
+                        $.each(result,function(i,obj) {
                             console.log(obj);
-                            var html = "<img style='margin:1px;' src='" + obj.image + " ' width='214px' height='120px'/>";
-                            $("#showImage").append(html);
+                            table_html += "<tr ><td>"+obj.clubId+"</td><td>"+obj.resourceId+"</td><td ><a href=\"#\" class=\"edit\"><em></em>Edit</a><td><a href=\"#\" class=\"delete\" onclick=\"deleteCam('"+obj.cameraId+"')\"><em></em>Delete</a></td></tr>";
+                        });
+                        $("#monitor_camert_list").html(table_html);
+                    }
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown)
+                {
+
+                }
+            })
+        }
+        function deleteCam(cameraId) {
+            var url="/deleteMonitorCam";
+            $.ajax({
+                type: "post",
+                url: url,
+                data: {
+                    cameraId:cameraId
+                },
+                dataType: "json",
+                success: function (result)
+                {
+                    if(result!=null){
+                        if(result.status=="0"){
+                            getMCam();
                         }
-
                     }
-                    else {
-                        alert("非文本消息");
-                    }
-                };
 
-                socket.onclose = function (msg) {
-                    console.log("socket closed!")
-                    //window.location.reload();
-                };
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-        });
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown)
+                {
+
+                }
+            })
+
+
+        }
+        function getAlert() {
+            var aurl="/findAllAlert"
+            $.ajax({
+                type: "post",
+                url: aurl,
+                success: function (result) {
+                    if(result!= null){
+                        var result = eval(result);
+                        var table_html = " <tr>\n" +
+                            "                        <th width=\"150\">Time</th>\n" +
+                            "                            <th>Club</th>\n" +
+                            "                            <th>ResourseID</th>\n" +
+                            "                            <th></th>\n" +
+                            "                            </tr>"
+                        $.each(result,function(i,obj) {
+                            console.log(obj);
+                            table_html += "<tr ><td>"+obj.time+"</td><td>"+obj.clubId+"</td><td >"+obj.cameraId+"</td><td><img src='"+obj.image+"' style=\"width: 100px;height: 50px\"/></td></tr>";
+                        });
+                        $("#alert_list").html(table_html);
+                    }
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown)
+                {
+
+                }
+            })
+            
+        }
     </script>
 
 </head>
-<body class="body">
+<body class="body" onload="getData()">
 <div class="header">
     <div class="header-inner clearfix">
         <div class="logo-box"><div class="logo"></div></div>
@@ -84,7 +136,7 @@
                 <ul class="setting-list">
                     <li><a href="#" class="user_management">User Management</a></li>
                     <li><a href="#" class="cam_management">Cam Management</a></li>
-                    <li><a href="#">Output Device Management</a></li>
+                    <li><a href="#" class="output_device_manaement">Output Device Management</a></li>
                 </ul>
             </div>
         </div>
@@ -96,21 +148,9 @@
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
+                        id="monitor_camert_list"
                 >
-                    <tr >
-                        <th width="150">Club</th>
-                        <th>Resource ID</th>
-                        <th>OutputDevice ID</th>
-                        <th></th>
-                    </tr>
-                    <tr th:each=" store: ${storeInfos}">
-                        <td th:text="${store.storeId}"></td>
-                        <td th:text="${store.sitResourceId}"></td>
-                        <td th:text="${store.storeName}"></td>
-                        <td>
-                            <a href="#" class="setting"><em></em>Setting</a>
-                        </td>
-                    </tr>
+
 
                 </table>
 
@@ -125,19 +165,8 @@
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
+                        id="alert_list"
                 >
-                    <tr>
-                        <th width="150">Time</th>
-                        <th>Club</th>
-                        <th>ResourseID</th>
-                        <th></th>
-                    </tr>
-                    <tr th:each="alert:${alertInfos}">
-                        <td th:text="${alert.time}"></td>
-                        <td th:text="${alert.storeId}"></td>
-                        <td th:text="${alert.cameraId}"></td>
-                        <td><img th:src="${alert.image}" style="width: 100px;height: 50px"/></td>
-                    </tr>
                 </table>
             </div>
         </div>
@@ -157,17 +186,9 @@
                     width="100%"
                     cellpadding="0"
                     cellspacing="0"
-            >
+                    id="userList">
                 <tr>
-                    <td class="user_name">zhangsan</td>
-                    <td class="change_pwd">Change Password</td>
-                </tr>
-                <tr>
-                    <td class="user_name">zhangsan</td>
-                    <td class="change_pwd">Change Password</td>
-                </tr>
-                <tr>
-                    <td class="user_name">zhangsan</td>
+                    <td class="user_name"></td>
                     <td class="change_pwd">Change Password</td>
                 </tr>
             </table>
@@ -190,52 +211,17 @@
                     width="100%"
                     cellpadding="0"
                     cellspacing="0"
+                    id="nm_cam_list"
             >
-                <tr class="tr_cam_list_title">
-                    <th width="150">Club Id</th>
-                    <th>Cam Name</th>
-                    <th>Reource Id</th>
-                    <th>Edit</th>
-                    <th>Monitor on-off</th>
-                    <th>on-off</th>
-                </tr>
-                <tr>
-                    <td class="club_id">123456</td>
-                    <td class="cam_id">Cam Name 1</td>
-                    <td class="resource_id">Resource Id</td>
-                    <td class="edit"><a href="#" class="edit_cam"><em></em></a></td>
-                    <td class="is_monitor_text">On</td>
-                    <td class="is_monitor"><input type="checkbox" checked></td>
-                </tr>
-                <tr>
-                    <td class="club_id">123456</td>
-                    <td class="cam_id">Cam Name 1</td>
-                    <td class="resource_id">Resource Id</td>
-                    <td class="edit"><a href="#" class="edit_cam"><em></em></a></td>
-                    <td class="is_monitor_text">On</td>
-                    <td class="is_monitor"><input type="checkbox" checked></td>
-                </tr>
-                <tr>
-                    <td class="club_id">123456</td>
-                    <td class="cam_id">Cam Name 1</td>
-                    <td class="resource_id">Resource Id</td>
-                    <td class="edit"><a href="#" class="edit_cam"><em></em></a></td>
-                    <td class="is_monitor_text">On</td>
-                    <td class="is_monitor"><input type="checkbox" checked></td>
-                </tr>
-                <tr>
-                    <td class="club_id">123456</td>
-                    <td class="cam_id">Cam Name 1</td>
-                    <td class="resource_id">Resource Id</td>
-                    <td class="edit"><a href="#" class="edit_cam"><em></em></a></td>
-                    <td class="is_monitor_text">On</td>
-                    <td class="is_monitor"><input type="checkbox" checked></td>
-                </tr>
             </table>
         </div>
         <div class="add-cam-box">
             <a href="#" class="btn-add-cam"><em></em>Add Cam</a>
         </div>
+        <div class="change_monitor_cam_error_div"></div>
+        <div class="btn_change_monitor_cam">Confirm</div>
+
+
     </div>
 </div>
 <div class="dialog_change_pwd_overlay"></div>
@@ -248,19 +234,79 @@
         <ul class="detail-list">
             <li>
                 UserName
-                <div class="right-option">ZhangSan</div>
+                <div class="right-option" id="userName">ZhangSan</div>
             </li>
             <li>
                 Password
-                <div class="right-option"><input id="c_password" name="c_password" type="password" placeholder="Password"></div>
+                <div class="right-option"><input id="c_password" name="c_password" required="required" type="password" placeholder="Password"></div>
             </li>
             <li>
                 Confirm Password
-                <div class="right-option"><input id="c_confirm_pwd" name="c_confirm_pwd" type="password" placeholder="Confirm Password"></div>
+                <div class="right-option"><input id="c_confirm_pwd" name="c_confirm_pwd" required="required" type="password" placeholder="Confirm Password"></div>
             </li>
         </ul>
     </div>
+    <div class="c_error_div" th:text="${error}"></div>
     <div class="btn_change_pwd">Confirm</div>
+</div>
+<!--add Cam-->
+<div class="dialog_add_simple_cam_overlay"></div>
+<div class="dialog_add_simple_cam">
+    <div class="detail-title">
+        <h5>Add Cam</h5>
+        <a href="#" class="btn-add-simple-cam-close"></a>
+    </div>
+    <div class="detail-box">
+        <ul class="detail-list">
+            <li>
+                Club
+                <div class="right-option"><input required="required" id="club" name="club" type="text" placeholder="Club"></div>
+            </li>
+            <li>
+                Resource Id
+                <div class="right-option"><input required="required" id="resource_id" name="resource_id" type="text" placeholder="Resource Id"></div>
+            </li>
+            <li>
+                Cam Name
+                <div class="right-option"><input required="required" id="cam_name" name="cam_name" type="text" placeholder="Resource Id"></div>
+            </li>
+        </ul>
+    </div>
+    <div class="a_simple_cam_error_div"></div>
+    <div class="btn_add_simple_cam">Confirm</div>
+</div>
+<div class="dialog_edit_simple_cam">
+    <div class="detail-title">
+        <h5>Edit Cam</h5>
+        <a href="#" class="btn-edit-simple-cam-close"></a>
+    </div>
+    <div class="detail-box">
+        <ul class="detail-list">
+            <input type="hidden" id="cameraId">
+            <li>
+                Cam Name
+                <div class="right-option"><input id="cameraName" name="cameraName" type="text" placeholder="Cam Name"></div>
+            </li>
+        </ul>
+    </div>
+    <div class="e_simple_cam_error_div"></div>
+    <div class="btn_edit_simple_cam">Confirm</div>
+</div>
+<div class="dialog_add_output_device">
+    <div class="detail-title">
+        <h5>Add Output Device</h5>
+        <a href="#" class="btn-add-output-device-close"></a>
+    </div>
+    <div class="detail-box">
+        <ul class="detail-list">
+            <li>
+                Output Device
+                <div class="right-option"><input id="output_device_name" name="output_device_name"  required="required" type="text" placeholder="Output device name"></div>
+            </li>
+        </ul>
+    </div>
+    <div class="a_d_error_div"></div>
+    <div class="btn_add_output_device">Confirm</div>
 </div>
 <div class="dialog_general_change_pwd">
     <div class="detail-title">
@@ -272,6 +318,7 @@
             <li>
                 UserName
                 <div class="right-option">ZhangSan</div>
+                <input type="hidden" id="userId">
             </li>
             <li>
                 Password
@@ -294,18 +341,19 @@
         <ul class="detail-list">
             <li>
                 UserName
-                <div class="right-option"><input id="a_username" name="a_username" type="text" placeholder="Username"></div>
+                <div class="right-option"><input id="a_username" name="a_username" required="required" type="text" placeholder="Username"></div>
             </li>
             <li>
                 Password
-                <div class="right-option"><input id="a_password" name="a_password" type="password" placeholder="Password"></div>
+                <div class="right-option"><input id="a_password" name="a_password" required="required" type="password" placeholder="Password"></div>
             </li>
             <li>
                 Confirm Password
-                <div class="right-option"><input id="a_confirm_pwd" name="a_confirm_pwd" type="password" placeholder="Confirm Password"></div>
+                <div class="right-option"><input id="a_confirm_pwd" name="a_confirm_pwd" required="required" type="password" placeholder="Confirm Password"></div>
             </li>
         </ul>
     </div>
+    <div class="a_error_div"></div>
     <div class="btn_add_user">Confirm</div>
 </div>
 <div class="dialog_overlay"></div>
@@ -367,22 +415,6 @@
                     </div>
                 </div>
             </li>
-            <!--<li>-->
-            <!--VideoROI-->
-            <!--<div class="right-option"></div>-->
-            <!--</li>-->
-            <!--<li>-->
-            <!--OutputDevice-->
-            <!--<div class="right-option">-->
-            <!--<div class="select-wrap select-device">-->
-            <!--<select name="device" id="device">-->
-            <!--<option value="0">Device 1</option>-->
-            <!--<option value="1">Device 2</option>-->
-            <!--<option value="2">Device 3</option>-->
-            <!--</select>-->
-            <!--</div>-->
-            <!--</div>-->
-            <!--</li>-->
         </ul>
     </div>
     <div class="result_div" >Error message</div>
@@ -391,7 +423,7 @@
     </div>
 </div>
 <script type="text/javascript">
-    //btn-setting
+
     $(".setting-box .btn-setting").hover(
         function() {
             $(this).addClass("active");
@@ -516,31 +548,51 @@
                     $(".result_div").css("color","#ff0000");
                 }
                 $(".result_div").text(result.message)
-                timeout()
+                timeout("result_div")
             },
             error:function (XMLHttpRequest, textStatus, errorThrown)
             {
                 $(".result_div").css("display","block")
                 $(".result_div").css("color","#ff0000");
                 $(".result_div").text(errorThrown)
-                timeout()
+                timeout("result_div")
             }
         })
 
     })
-    function timeout() {
+    function timeout(clazz) {
         setTimeout(function () {
-            $(".result_div").css("display","none")
+            $("."+clazz+"").css("display","none")
         },2000)
     }
     $(".user_management").click(function () {
-        $(".dialog_admin_overlay").show();
-        $(".dialog_admin").css("display", "block");
-        setTimeout(
-            "$('.dialog_admin').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
-            50
-        );
 
+        var url="/findAllUsers"
+        $.ajax({
+            type: "post",
+            url: url,
+            success: function (result) {
+
+                if(result!= null){
+                    var result = eval(result);
+                    var table_html = "";
+                    $.each(result,function(i,obj) {
+                        table_html += "<tr><td class=\"user_name\">"+ obj.userName +"</td><td class=\"change_pwd\" name='chnagepwd'  onclick=\"changPwd('"+obj.userId+"','"+obj.userName+"')\">Change Password</td></tr>";
+                    });
+                    $("#userList").html(table_html);
+                }
+                $(".dialog_admin_overlay").show();
+                $(".dialog_admin").css("display", "block");
+                setTimeout(
+                    "$('.dialog_admin').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+                    50
+                );
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
+            }
+        })
     })
     $(".btn-admin-close").click(function () {
         $(".dialog_admin_overlay").hide();
@@ -551,7 +603,9 @@
         });
 
     })
-    $(".change_pwd").click(function () {
+    function changPwd(userId,userName){
+        $("#userName").html(userName);
+        $("#userId").val(userId);
         $(".dialog_change_pwd_overlay").show();
         $(".dialog_change_pwd").css("display", "block");
         setTimeout(
@@ -559,7 +613,7 @@
             50
         );
 
-    })
+    }
     $(".btn-change-pwd-close").click(function () {
         $(".dialog_change_pwd_overlay").hide();
         $(".dialog_change_pwd").css({
@@ -587,6 +641,7 @@
 
     })
     $(".cam_management").click(function () {
+        refreshNmCam();
         $(".dialog_admin_overlay").show();
         $(".dialog_cam_management").css("display", "block");
         setTimeout(
@@ -594,7 +649,134 @@
             50
         );
 
+    })
+    function refreshNmCam(){
+        var url="/findNmCamera";
+        $.ajax({
+            type: "post",
+            url: url,
+            success: function (result) {
+                if(result!= null){
+                    var result = eval(result);
+                    var table_html = "<tr class=\"tr_cam_list_title\">\n" +
+                        "                        <th width=\"150\">Club Id</th>\n" +
+                        "                    <th>Cam Name</th>\n" +
+                        "                    <th>Reource Id</th>\n" +
+                        "                    <th>Edit</th>\n" +
+                        "                    <th>Monitor on-off</th>\n" +
+                        "                    <th>on-off</th>\n" +
+                        "                    </tr>";
+                    $.each(result,function(i,obj) {
+                        table_html += "<tr><td class=\"club_id\">"+ obj.clubId +"</td>" +
+                            "<td class=\"cam_id\">"+obj.cameraName+"</td>"+
+                            "<td class=\"resource_id\">"+obj.resourceId+"</td>"+
+                            "<td class=\"edit\"><a href=\"#\" class=\"edit_cam\" onclick=\"editCam('"+obj.cameraId+"')\" ><em></em></a></td>"+
+                            "<td class=\"is_monitor_text\">On</td>"+
+                            "<td class=\"is_monitor\"><input type=\"checkbox\" onclick=\"monitorCam(this,'"+obj.cameraId+"')\"></td></tr>";
+                    });
+                    $("#nm_cam_list").html(table_html);
+                    //显示弹出框
 
+                }
+
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
+            }
+        })
+    }
+    var monitor=[];
+    function monitorCam(checkBox,cameraId) {
+        if(checkBox.checked){
+            monitor.push(cameraId);
+        }else {
+            var index = monitor.indexOf(cameraId);
+            if (index >= 0) {
+                monitor.splice(index, 1);
+            }
+        }
+    }
+    $(".btn_change_monitor_cam").click(function () {
+        var url="/changeMonitorCam";
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                monitor:monitor
+            },
+            dataType: "json",
+            traditional: true,
+            success: function (result) {
+                $(".change_monitor_cam_error_div").css("display","block")
+                if(result.status=="0"){
+                    $(".change_monitor_cam_error_div").css("color","#2edd57");
+                }else{
+                    $(".change_monitor_cam_error_div").css("color","#ff0000");
+                }
+                $(".change_monitor_cam_error_div").text(result.message)
+                timeout("change_monitor_cam_error_div")
+                //设置成功，刷新界面
+                refreshNmCam();
+                getMCam();
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
+                $(".change_monitor_cam_error_div").css("display","block")
+                $(".change_monitor_cam_error_div").css("color","#ff0000");
+                $(".change_monitor_cam_error_div").text(errorThrown)
+                timeout("change_monitor_cam_error_div")
+            }
+        })
+    })
+    function editCam(cameraId){
+        $("#cameraId").val(cameraId);
+        $(".dialog_add_simple_cam_overlay").show();
+        $(".dialog_edit_simple_cam").css("display", "block");
+        setTimeout(
+            "$('.dialog_edit_simple_cam').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+            50
+        );
+
+
+    }
+    $(".btn_edit_simple_cam").click(function () {
+        var cameraId=$("#cameraId").val();
+        var cameraName=$("#cameraName").val();
+        var url="/editSimpleCam";
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                cameraId:cameraId,
+                cameraName:cameraName
+            },
+            dataType: "json",
+            success: function (result)
+            {
+                $(".e_simple_cam_error_div").css("display","block")
+                if(result.status=="0"){
+                    $(".e_simple_cam_error_div").css("color","#2edd57");
+                    refreshNmCam();
+                }else{
+                    $(".e_simple_cam_error_div").css("color","#ff0000");
+                }
+                $(".e_simple_cam_error_div").text(result.message)
+                timeout("e_simple_cam_error_div")
+
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+                $(".e_simple_cam_error_div").css("display","block")
+                $(".e_simple_cam_error_div").css("color","#ff0000");
+                $(".e_simple_cam_error_div").text(errorThrown)
+                timeout("e_simple_cam_error_div")
+            }
+        })
+
+
+        
     })
     $(".btn-cam-close").click(function () {
         $(".dialog_admin_overlay").hide();
@@ -604,6 +786,195 @@
             display: "none"
         });
     })
+
+    $(".btn-add-simple-cam-close").click(function () {
+        $(".dialog_add_simple_cam_overlay").hide();
+        $(".dialog_add_simple_cam").css({
+            opacity: "0",
+            "-webkit-transform": "scale(0)",
+            display: "none"
+        });
+
+
+    })
+    $(".btn-add-cam").click(function () {
+        $(".dialog_add_simple_cam_overlay").show();
+        $(".dialog_add_simple_cam").css("display", "block");
+        setTimeout(
+            "$('.dialog_add_simple_cam').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+            50
+        );
+    })
+    $(".btn-edit-simple-cam-close").click(function () {
+        $(".dialog_add_simple_cam_overlay").hide();
+        $(".dialog_edit_simple_cam").css({
+            opacity: "0",
+            "-webkit-transform": "scale(0)",
+            display: "none"
+        });
+
+
+    })
+    $(".output_device_manaement").click(function () {
+        $(".dialog_admin_overlay").show();
+        $(".dialog_add_output_device").css("display", "block");
+        setTimeout(
+            "$('.dialog_add_output_device').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+            50
+        );
+    })
+    $(".btn-add-output-device-close").click(function () {
+        $(".dialog_admin_overlay").hide();
+        $(".dialog_add_output_device").css({
+            opacity: "0",
+            "-webkit-transform": "scale(0)",
+            display: "none"
+        });
+
+    })
+    $(".btn_change_pwd").click(function () {
+        var password = $("#c_password").val();
+        var c_password = $("#c_confirm_pwd").val();
+        var userId = $("#userId").val()
+        if (password != c_password) {
+            $(".c_error_div").css("display", "block");
+            $(".c_error_div").text("You enter your password twice, please re-enter");
+            timeout("c_error_div");
+            return;
+        }
+        var url = "/changePwd"
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                userId:userId,
+                password: password
+            },
+            dataType: "json",
+            success: function (result) {
+                $(".c_error_div").css("display","block")
+                if(result.status=="0"){
+                    $(".c_error_div").css("color","#2edd57");
+                }else{
+                    $(".c_error_div").css("color","#ff0000");
+                }
+                $(".c_error_div").text(result.message)
+                timeout("c_error_div");
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $(".c_error_div").css("display","block");
+                $(".c_error_div").css("color","#ff0000");
+                $(".c_error_div").text(errorThrown)
+                timeout("c_error_div");
+            }
+
+
+        })
+    })
+
+    $(".btn_add_user").click(function () {
+        var userName=$("#a_username").val();
+        var password=$("#a_password").val();
+        var c_password=$("#a_confirm_pwd").val();
+        if(password != c_password){
+            $(".a_error_div").css("display", "block");
+            $(".a_error_div").text("You enter your password twice, please re-enter");
+            timeout("a_error_div");
+            return
+        }
+        var url="/addUser";
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                userName:userName,
+                password: password
+            },
+            dataType: "json",
+            success: function (result) {
+                $(".a_error_div").css("display","block")
+                if(result.status=="0"){
+                    $(".a_error_div").css("color","#2edd57");
+                }else{
+                    $(".a_error_div").css("color","#ff0000");
+                }
+                $(".a_error_div").text(result.message)
+                timeout("a_error_div");
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $(".a_error_div").css("display","block");
+                $(".a_error_div").css("color","#ff0000");
+                $(".a_error_div").text(errorThrown)
+                timeout("a_error_div");
+            }
+
+
+        })
+    })
+
+    $(".btn_add_output_device").click(function () {
+        var name=$("#output_device_name").val()
+        var url="/addOutputDevice";
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                name:name,
+            },
+            dataType: "json",
+            success: function (result) {
+                $(".a_d_error_div").css("display","block")
+                if(result.status=="0"){
+                    $(".a_d_error_div").css("color","#2edd57");
+                }else{
+                    $(".a_d_error_div").css("color","#ff0000");
+                }
+                $(".a_d_error_div").text(result.message)
+                timeout("a_d_error_div");
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $(".a_d_error_div").css("display","block");
+                $(".a_d_error_div").css("color","#ff0000");
+                $(".a_d_error_div").text(errorThrown)
+                timeout("a_d_error_div");
+            }
+        })
+    })
+    $(".btn_add_simple_cam").click(function () {
+        var clubId=$("#club").val();
+        var resourceId=$("#resource_id").val();
+        var camName=$("#cam_name").val();
+        var url="/addSimpleCam"
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                clubId:clubId,
+                resourceId:resourceId,
+                camName:camName
+            },
+            dataType: "json",
+            success: function (result) {
+                $(".a_simple_cam_error_div").css("display","block")
+                if(result.status=="0"){
+                    $(".a_simple_cam_error_div").css("color","#2edd57");
+                }else{
+                    $(".a_simple_cam_error_div").css("color","#ff0000");
+                }
+                $(".a_simple_cam_error_div").text(result.message)
+                timeout("a_simple_cam_error_div");
+                refreshNmCam();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $(".a_simple_cam_error_div").css("display","block");
+                $(".a_simple_cam_error_div").css("color","#ff0000");
+                $(".a_simple_cam_error_div").text(errorThrown)
+                timeout("a_simple_cam_error_div");
+            }
+        })
+        
+    })
+
 
 </script>
 </body>

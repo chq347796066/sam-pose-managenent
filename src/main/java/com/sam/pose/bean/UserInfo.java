@@ -25,6 +25,8 @@ public class UserInfo implements Serializable {
     private String userId;
     private String userName;
     private String userPwd;
+    //0代表管理员，1代表普通成员
+    private String userCharacter;
     @PartitionKey
     private String partitionId;
 

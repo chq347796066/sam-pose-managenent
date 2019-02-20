@@ -27,7 +27,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserInfo findByUserName(String userName) {
-        userName=Md5Util.md5(userName);
         List<UserInfo>userInfos= userInfoRepository.findByUserName(userName);
         if(userInfos!=null&&userInfos.size()>0){
             return userInfos.get(0);

@@ -16,12 +16,12 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "storeInfo")
+@Document(collection = "clubInfo")
 @DocumentIndexingPolicy(mode = IndexingMode.Consistent)
-public class StoreInfo implements Serializable {
+public class ClubInfo implements Serializable {
     @Id
-    private String storeId;
-    private String storeName;
+    private String clubId;
+    private String clubName;
     private String sitResourceId;
     @PartitionKey
     private String partitionId;

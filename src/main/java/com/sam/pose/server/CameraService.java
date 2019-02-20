@@ -6,5 +6,7 @@ public interface CameraService {
     void save(CameraInfo info);
     Iterable<CameraInfo>findAll();
     void deleteAll();
+    void changeMonitorCam(String[]cameraIds);
 
+    void deleteMonitorCam(String cameraId);
 }

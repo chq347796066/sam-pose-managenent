@@ -2,7 +2,7 @@ package com.sam.pose.controller;
 
 import com.sam.pose.bean.*;
 import com.sam.pose.dao.AlertInfoRepository;
-import com.sam.pose.dao.StoreInfoRepository;
+import com.sam.pose.dao.ClubInfoRepository;
 import com.sam.pose.parameter.SettingBean;
 import com.sam.pose.server.CameraSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +16,27 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
-    private StoreInfoRepository storeInfoRepository;
+    private ClubInfoRepository storeInfoRepository;
     @Autowired
     private AlertInfoRepository alertInfoRepository;
 
     @Autowired
     private CameraSettingService cameraSettingService;
 
-    private boolean isFirst=true;
 
-    private List<StoreInfo>storeInfos;
-    private List<AlertInfo>alertInfos;
     @RequestMapping("/home")
     public String home(Model model){
-        System.out.println(isFirst);
-        if(isFirst) {
-            storeInfos = (List<StoreInfo>) storeInfoRepository.findAll();
-            alertInfos = (List<AlertInfo>) alertInfoRepository.findAll();
-            isFirst=false;
-        }
-        model.addAttribute("storeInfos", storeInfos);
-        model.addAttribute("alertInfos", alertInfos);
         return "ListPage";
     }
+
+
+
+
+
+
+
+
+
 
 
     @RequestMapping(value = "/setting",method = RequestMethod.POST)
@@ -63,4 +61,9 @@ public class HomeController {
     public String pose(){
         return "openpose";
     }
+
+
+
+
+
 }
