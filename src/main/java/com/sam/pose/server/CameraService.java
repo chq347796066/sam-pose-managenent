@@ -9,4 +9,5 @@ public interface CameraService {
     void changeMonitorCam(String[]cameraIds);
 
     void deleteMonitorCam(String cameraId);
+
 }

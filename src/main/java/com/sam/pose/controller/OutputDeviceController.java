@@ -1,7 +1,9 @@
 package com.sam.pose.controller;
 
+import com.sam.pose.bean.ClubInfo;
 import com.sam.pose.bean.OutputDeviceInfo;
 import com.sam.pose.bean.Result;
+import com.sam.pose.dao.ClubInfoRepository;
 import com.sam.pose.dao.OutputDeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,32 +18,70 @@ public class OutputDeviceController {
 
     @Autowired
     private OutputDeviceRepository outputDeviceRepository;
+    @Autowired
+    private ClubInfoRepository clubInfoRepository;
 
     @RequestMapping(value = "/addOutputDevice",method = RequestMethod.POST)
     @ResponseBody
-    public Result addOutputDevice(String name){
-        System.out.println("name:"+name);
+    public Result addOutputDevice(String name,String clubId){
+        System.out.println("name:"+name+"clubId:"+clubId);
         try {
-            List<OutputDeviceInfo>devices=outputDeviceRepository.findByName(name);
-            if(devices!=null&&devices.size()>0){
-                return new Result("1","Have the same name, please re-enter");
+            List<ClubInfo>clubInfos=clubInfoRepository.findByClubId(clubId);
+            if(clubInfos!=null&&clubInfos.size()>0) {
+                List<OutputDeviceInfo> devices = outputDeviceRepository.findByName(name);
+                if (devices != null && devices.size() > 0) {
+                    return new Result("1", "Have the same name, please re-enter");
+                }
+                String deviceId=clubId+"_"+name;
+                OutputDeviceInfo info = new OutputDeviceInfo(deviceId, name, clubId, clubId);
+                outputDeviceRepository.save(info);
+                return new Result("0", "Added successfully");
+            }else {
+                return new Result("1","club does not exist");
             }
-            OutputDeviceInfo info = new OutputDeviceInfo(null, name, "1");
-            outputDeviceRepository.save(info);
-            return new Result("0", "Added successfully");
         }catch (Exception e){
             System.out.println(e);
             return new Result("1","Network error");
         }
 
     }
-    @RequestMapping("/addDevice")
+
+    @RequestMapping("/findAllOutput")
     @ResponseBody
-    public String addOutputDevice(){
-        List<OutputDeviceInfo>infos=outputDeviceRepository.findByName("6372_111");
-        OutputDeviceInfo info=new OutputDeviceInfo("1","6372_111","1");
-        outputDeviceRepository.save(info);
+    public List<OutputDeviceInfo>findAll(){
+        return (List<OutputDeviceInfo>) outputDeviceRepository.findAll();
+
+    }
+
+    @RequestMapping("/findOutputByClubId")
+    @ResponseBody
+    public List<OutputDeviceInfo>findOutputByClubId(String clubId){
+        return outputDeviceRepository.findByClubId(clubId);
+
+    }
+    @RequestMapping("/deleteAllOutput")
+    @ResponseBody
+    public String delete(){
+        outputDeviceRepository.deleteAll();
         return "success";
 
     }
+    @RequestMapping("/deleteOutput")
+    @ResponseBody
+    public Result deleteOutput(String deviceId){
+        System.out.println("deviceId:"+deviceId);
+        try {
+            List<OutputDeviceInfo>outputDeviceInfos=outputDeviceRepository.findByDeviceId(deviceId);
+            if(outputDeviceInfos!=null&&outputDeviceInfos.size()>0){
+                outputDeviceRepository.delete(outputDeviceInfos.get(0));
+                return new Result("0", "Delete successfully");
+            }
+            return new Result("1","Delete failed");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return new Result("1","Network error");
+        }
+
+    }
+
 }

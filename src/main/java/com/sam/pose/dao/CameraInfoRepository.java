@@ -10,4 +10,5 @@ import java.util.List;
 public interface CameraInfoRepository extends DocumentDbRepository<CameraInfo,String> {
     List<CameraInfo> findByCameraId(String cameraId);
     List<CameraInfo> findByIsMonitor(String isMonitor);
+    List<CameraInfo>findByClubId(String clubId);
 }

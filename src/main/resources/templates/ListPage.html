@@ -33,9 +33,14 @@
         }
         function getMCam() {
             var curl="/findMCamera";
+            var clubId=$(".search_club_id").val();
             $.ajax({
                 type: "post",
                 url: curl,
+                data:{
+                    clubId:clubId
+                },
+                dataType:"json",
                 success: function (result) {
                     if(result!= null){
                         var result = eval(result);
@@ -47,7 +52,7 @@
                             "                    </tr>";
                         $.each(result,function(i,obj) {
                             console.log(obj);
-                            table_html += "<tr ><td>"+obj.clubId+"</td><td>"+obj.resourceId+"</td><td ><a href=\"#\" class=\"edit\"><em></em>Edit</a><td><a href=\"#\" class=\"delete\" onclick=\"deleteCam('"+obj.cameraId+"')\"><em></em>Delete</a></td></tr>";
+                            table_html += "<tr ><td>"+obj.clubId+"</td><td>"+obj.cameraId+"</td><td ><a href=\"#\" class=\"edit\" onclick=\"editMCam('"+obj.cameraId+"','"+obj.clubId+"')\"><em></em>Edit</a><td><a href=\"#\" class=\"delete\" onclick=\"deleteCam('"+obj.cameraId+"')\"><em></em>Delete</a></td></tr>";
                         });
                         $("#monitor_camert_list").html(table_html);
                     }
@@ -57,6 +62,46 @@
 
                 }
             })
+        }
+
+        function editMCam(cameraId,clubId) {
+            $("#div_camera_id").html(cameraId);
+            $(".dialog_overlay").show();
+            $(".edit-detail").css("display", "block");
+            setTimeout(
+                "$('.edit-detail').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+                50
+            );
+            //发送请求获取outputdevice list
+            var url="/findOutputByClubId"
+            $.ajax({
+                type: "post",
+                url: url,
+                data:{
+                    clubId:clubId
+                },
+                dataType: "json",
+                success: function (result) {
+                    if(result!= null){
+                        var result = eval(result);
+                        var table_html = "";
+
+                        $.each(result,function(i,obj) {
+                            table_html +="<li>"+obj.name+"<input type=\"checkbox\" onclick=\"editOutputDevice(this,'"+obj.deviceId+"')\" ></li>";
+                        });
+                        $(".edit-output-device-list").html(table_html);
+                        //显示弹出框
+
+                    }
+
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown)
+                {
+
+                }
+            })
+
+            
         }
         function deleteCam(cameraId) {
             var url="/deleteMonitorCam";
@@ -85,10 +130,15 @@
 
         }
         function getAlert() {
-            var aurl="/findAllAlert"
+            var aurl="/findAllAlert";
+            var clubId=$(".search_club_id").val();
             $.ajax({
                 type: "post",
                 url: aurl,
+                data:{
+                    clubId:clubId
+                },
+                dataType:"json",
                 success: function (result) {
                     if(result!= null){
                         var result = eval(result);
@@ -99,8 +149,8 @@
                             "                            <th></th>\n" +
                             "                            </tr>"
                         $.each(result,function(i,obj) {
-                            console.log(obj);
-                            table_html += "<tr ><td>"+obj.time+"</td><td>"+obj.clubId+"</td><td >"+obj.cameraId+"</td><td><img src='"+obj.image+"' style=\"width: 100px;height: 50px\"/></td></tr>";
+                            var time=formatStamp(obj.time);
+                            table_html += "<tr ><td>"+time+"</td><td>"+obj.clubId+"</td><td >"+obj.cameraId+"</td><td><img src='"+obj.image+"' style=\"width: 100px;height: 50px\" onclick=\"showImage('"+obj.image+"')\"/></td></tr>";
                         });
                         $("#alert_list").html(table_html);
                     }
@@ -110,8 +160,12 @@
 
                 }
             })
-            
+
         }
+
+
+
+
     </script>
 
 </head>
@@ -142,6 +196,7 @@
         </div>
         <div class="table-list">
             <div class="table-title"><h4>DeviceList</h4></div>
+            <div class="search"><input class="search_club_id" type="text" placeholder="please input clubId"><a href="#"class="search_club">Search</a></div>
             <div class="table-box">
                 <table
                         class="table-detail"
@@ -198,6 +253,9 @@
         </div>
     </div>
 </div>
+
+
+
 <div class="dialog_cam_management">
     <div class="detail-title">
         <h5>Cam Management</h5>
@@ -249,12 +307,22 @@
     <div class="c_error_div" th:text="${error}"></div>
     <div class="btn_change_pwd">Confirm</div>
 </div>
+<!--show image-->
+<div class="dialog_show_image">
+    <div class="detail-title">
+        <h5>Alert Image</h5>
+        <a href="javascript:void(0);" class="btn-image-close"></a>
+    </div>
+    <div class="detail-box">
+       <img src="" class="image_big">
+    </div>
+</div>
 <!--add Cam-->
 <div class="dialog_add_simple_cam_overlay"></div>
 <div class="dialog_add_simple_cam">
     <div class="detail-title">
         <h5>Add Cam</h5>
-        <a href="#" class="btn-add-simple-cam-close"></a>
+        <a href="javascript:void(0);" class="btn-add-simple-cam-close"></a>
     </div>
     <div class="detail-box">
         <ul class="detail-list">
@@ -278,7 +346,7 @@
 <div class="dialog_edit_simple_cam">
     <div class="detail-title">
         <h5>Edit Cam</h5>
-        <a href="#" class="btn-edit-simple-cam-close"></a>
+        <a href="javascript:void(0);" class="btn-edit-simple-cam-close"></a>
     </div>
     <div class="detail-box">
         <ul class="detail-list">
@@ -292,13 +360,49 @@
     <div class="e_simple_cam_error_div"></div>
     <div class="btn_edit_simple_cam">Confirm</div>
 </div>
+<!--输出设备管理弹窗-->
+<div class="dialog_output_device_management">
+    <div class="detail-title">
+        <h5>Output Device Management</h5>
+        <a href="javascript:void(0);" class="btn-output-device-close"></a>
+    </div>
+    <div class="div_output_device_title">Output Device List</div>
+    <div class="output-device-table-list">
+        <div class="table-box">
+            <table
+                    class="table-detail"
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    id="output_device_list"
+            >
+                <!--<tr >-->
+                <!--<td width="150">Output Device Name</td>-->
+                <!--<td>ClubId</td>-->
+                <!--<td><a href="javascript:void(0);" class="edit_outputdevice"><em></em>Edit</a></td>-->
+                <!--<td><a href="javascript:void(0);" class="delete_outputdevice"><em></em>Delete</a></td>-->
+                <!--</tr>-->
+
+            </table>
+        </div>
+        <div class="add-output-device-box">
+            <a href="javascript:void(0);" class="btn-add-output-device"><em></em>Add Output Device</a>
+        </div>
+
+
+    </div>
+</div>
 <div class="dialog_add_output_device">
     <div class="detail-title">
         <h5>Add Output Device</h5>
-        <a href="#" class="btn-add-output-device-close"></a>
+        <a href="javascript:void(0);" class="btn-add-output-device-close"></a>
     </div>
     <div class="detail-box">
         <ul class="detail-list">
+            <li>
+                Club Id
+                <div class="right-option"><input id="output_club_id" name="output_club_id"  required="required" type="text" placeholder="Club Id"></div>
+            </li>
             <li>
                 Output Device
                 <div class="right-option"><input id="output_device_name" name="output_device_name"  required="required" type="text" placeholder="Output device name"></div>
@@ -311,7 +415,7 @@
 <div class="dialog_general_change_pwd">
     <div class="detail-title">
         <h5>Change Password</h5>
-        <a href="#" class="btn-general-change-pwd-close"></a>
+        <a href="javascript:void(0);" class="btn-general-change-pwd-close"></a>
     </div>
     <div class="detail-box">
         <ul class="detail-list">
@@ -335,7 +439,7 @@
 <div class="dialog_add_user">
     <div class="detail-title">
         <h5>Add User</h5>
-        <a href="#" class="btn-add-user-close"></a>
+        <a href="javascript:void(0);" class="btn-add-user-close"></a>
     </div>
     <div class="detail-box">
         <ul class="detail-list">
@@ -359,17 +463,24 @@
 <div class="dialog_overlay"></div>
 <input type="hidden" id="color_min" value="173,100,96">
 <input type="hidden" id="color_max" value="173,100,96">
+<input type="hidden" id="edit_color_min" value="173,100,96">
+<input type="hidden" id="edit_color_max" value="173,100,96">
 <div class="add-detail">
     <div class="div_colorpicker" ></div>
     <div class="detail-title">
-        <h5>ParameterOfModelList</h5>
-        <a href="#" class="btn-close"></a>
+        <h5>Add Camera</h5>
+        <a href="javascript:void(0);" class="btn-close"></a>
     </div>
     <div class="detail-box">
         <ul class="detail-list">
             <li>
                 CameraId
-                <div class="right-option"><input id="cameraId" name="cameraId" type="text" placeholder="请输入摄相头id"></div>
+                <div class="right-option">
+                    <div class="select-wrap select-camera-id">
+                        <select name="select-camera-id" id="select_camera_id" >
+                        </select>
+                    </div>
+                </div>
             </li>
             <li>
                 ColorReference
@@ -415,13 +526,110 @@
                     </div>
                 </div>
             </li>
+            <li>
+                Select OutputDevice
+                <div class="right-option">
+                    <div class="select-wrap select-output-device">
+                        <a href="javascript:void(0);" class="show-output-device-list">Select output Device</a>
+                    </div>
+                </div>
+            </li>
         </ul>
     </div>
-    <div class="result_div" >Error message</div>
+    <div class="output-device-list-div">
+        <ul class="output-device-list">
+        </ul>
+    </div>
+
+    <div class="result_div" ></div>
     <div class="btn-box">
-        <a href="#" class="btn-confirm">Confirm</a>
+        <a href="javascript:void(0);" class="btn-confirm">Confirm</a>
     </div>
 </div>
+
+
+<!--修改-->
+<div class="edit-detail">
+    <div class="div_edit_colorpicker" ></div>
+    <div class="detail-title">
+        <h5>Edit Camera</h5>
+        <a href="javascript:void(0);" class="btn-edit-close"></a>
+    </div>
+    <div class="detail-box">
+        <ul class="detail-list">
+            <li>
+                CameraId
+                <div class="right-option">
+                    <div class="select-camera-id">
+                        <div id="div_camera_id">CameraId</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                ColorReference
+                <div class="right-option"><button id="edit_colorpicker_min" class="edit_colorpicker"></button><button class="edit_colorpicker" id="edit_colorpicker_max"></button></div>
+            </li>
+            <li>
+                Threshold
+                <div class="right-option"></div>
+            </li>
+            <li>
+                VideoFPS
+                <div class="right-option">
+                    <div class="select-wrap select-edit-fps">
+                        <select name="edit_video_fps" id="edit_video_fps">
+                            <option value="0">15</option>
+                            <option value="1">10</option>
+                            <option value="2">5</option>
+                        </select>
+                    </div>
+                </div>
+            </li>
+            <li>
+                VedioResolution
+                <div class="right-option">
+                    <div class="select-wrap select-eidt-resolution">
+                        <select name="edit_resolution" id="eidt_resolution">
+                            <option value="0">1024 x 768</option>
+                            <option value="1">1024 x 768</option>
+                            <option value="2">1024 x 768</option>
+                        </select>
+                    </div>
+                </div>
+            </li>
+            <li>
+                Compression ratio
+                <div class="right-option">
+                    <div class="select-wrap select-edit-ratio">
+                        <select name="edit_compression-ratio" class="edit_compression_ratio">
+                            <option value="0">0.8</option>
+                            <option value="1">0.5</option>
+                            <option value="2">0.3</option>
+                        </select>
+                    </div>
+                </div>
+            </li>
+            <li>
+                Select OutputDevice
+                <div class="right-option">
+                    <div class="select-wrap select-output-device">
+                        <a href="javascript:void(0);" class="edit-show-output-device-list">Select output Device</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="edit-output-device-list-div">
+        <ul class="edit-output-device-list">
+        </ul>
+    </div>
+
+    <div class="edit_result_div" ></div>
+    <div class="btn-box">
+        <a href="#" class="btn-edit-confirm">Confirm</a>
+    </div>
+</div>
+
 <script type="text/javascript">
 
     $(".setting-box .btn-setting").hover(
@@ -452,6 +660,28 @@
 
     //btn-add
     $(".table-list .table-box .add-box .btn-add").click(function() {
+        //发送请求，获取camera 列表
+        var url="/findNmCamera";
+        $.ajax({
+            type: "post",
+            url: url,
+            success: function (result) {
+                if(result!= null){
+                    var result = eval(result);
+                    var table_html = "";
+                    $.each(result,function(i,obj) {
+                        table_html += "<option value='"+obj.cameraId+"'>"+obj.cameraId+"</option>";
+                    });
+                    $("#select_camera_id").html(table_html);
+                    //显示弹出框
+                }
+
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
+            }
+        })
         $(".dialog_overlay").show();
         $(".add-detail").css("display", "block");
         setTimeout(
@@ -468,6 +698,14 @@
             display: "none"
         });
     });
+    $(".btn-edit-close").click(function() {
+        $(".dialog_overlay").hide();
+        $(".edit-detail").css({
+            opacity: "0",
+            "-webkit-transform": "scale(0)",
+            display: "none"
+        });
+    });
     $("#colorpicker_min").click(function () {
         var LiveCallbackButton = $('#colorpicker_min');
         $(".div_colorpicker").jPicker(
@@ -477,7 +715,7 @@
             {
                 var all = color.val('all');
                 var sColor=all && '#' + all.hex || 'none';
-                var color_min="["+all.h+","+all.s+","+all.v+"]"
+                var color_min=all.h+","+all.s+","+all.v
                 $("#color_min").val(color_min)
                 LiveCallbackButton.css({backgroundColor:sColor});
                 $('#Commit').css(
@@ -504,7 +742,7 @@
                 var all = color.val('all');
                 var color=all && '#' + all.hex || 'none';
                 LiveCallbackButton.css({backgroundColor:color});
-                var color_max="["+all.h+","+all.s+","+all.v+"]"
+                var color_max=all.h+","+all.s+","+all.v
                 $("#color_max").val(color_max)
                 $('#Commit').css(
                     {
@@ -520,14 +758,68 @@
             }
         );
     })
+
+
+    $("#edit_colorpicker_min").click(function () {
+        var LiveCallbackButton = $('#edit_colorpicker_min');
+        $(".div_edit_colorpicker").jPicker(
+            {},
+            //ok
+            function(color, context)
+            {
+                var all = color.val('all');
+                var sColor=all && '#' + all.hex || 'none';
+                var color_min=all.h+","+all.s+","+all.v
+                $("#edit_color_min").val(color_min)
+                LiveCallbackButton.css({backgroundColor:sColor});
+                $('#Commit').css(
+                    {
+                        backgroundColor: all && '#' + all.hex || 'transparent'
+                    });
+                $(".div_edit_colorpicker").hide()
+            },
+            {},
+            //cancel
+            function(color, context)
+            {
+                $(".div_edit_colorpicker").hide()
+            }
+        );
+    })
+    $("#edit_colorpicker_max").click(function () {
+        var LiveCallbackButton = $('#edit_colorpicker_max');
+        $(".div_edit_colorpicker").jPicker(
+            {},
+            //ok
+            function(color, context)
+            {
+                var all = color.val('all');
+                var color=all && '#' + all.hex || 'none';
+                LiveCallbackButton.css({backgroundColor:color});
+                var color_max=all.h+","+all.s+","+all.v
+                $("#edit_color_max").val(color_max)
+                $('#Commit').css(
+                    {
+                        backgroundColor: all && '#' + all.hex || 'transparent'
+                    });
+                $(".div_edit_colorpicker").hide();
+            },
+            {},
+            //cancel
+            function(color, context)
+            {
+                $(".div_edit_colorpicker").hide()
+            }
+        );
+    })
     $(".btn-confirm").click(function () {
-        var cameraId=$("#cameraId").val()
-        var colorMin=$("#color_min").val()
-        var colorMax=$("#color_max").val()
+        var colorMin=$("#color_min").val();
+        var colorMax=$("#color_max").val();
         var vedioFps=$(".select-fps").find("option:selected").text();
+        var cameraId=$("#select_camera_id").find("option:selected").text();
         var compressionRatio=$(".compression_ratio").find("option:selected").text();
 
-        var url="/setting"
+        var url="/addMonitorCamera"
         $.ajax({
             type: "post",
             url: url,
@@ -536,26 +828,73 @@
                 vedioFps:vedioFps,
                 compressionRatio:compressionRatio,
                 colorMin:colorMin,
-                colorMax:colorMax
+                colorMax:colorMax,
+                deviceIds:selectDevice
             },
             dataType: "json",
+            traditional: true,
             success: function (result)
             {
-                $(".result_div").css("display","block")
-                if(result.status=="0"){
-                    $(".result_div").css("color","#2edd57");
-                }else{
-                    $(".result_div").css("color","#ff0000");
+                if(result!=null){
+                    $(".result_div").css("display","block")
+                    if(result.status=="0"){
+                        $(".result_div").css("color","#2edd57");
+                    }else{
+                        $(".result_div").css("color","#ff0000");
+                    }
+                    $(".result_div").text(result.message)
+                    timeout("result_div")
+                    //获取data
+                    getMCam();
                 }
-                $(".result_div").text(result.message)
-                timeout("result_div")
             },
             error:function (XMLHttpRequest, textStatus, errorThrown)
             {
-                $(".result_div").css("display","block")
-                $(".result_div").css("color","#ff0000");
-                $(".result_div").text(errorThrown)
-                timeout("result_div")
+
+            }
+        })
+
+    })
+
+    $(".btn-edit-confirm").click(function () {
+        var colorMin=$("#edit_color_min").val();
+        var colorMax=$("#edit_color_max").val();
+        var vedioFps=$(".select-edit-fps").find("option:selected").text();
+        var cameraId=$("#div_camera_id").html();
+        var compressionRatio=$(".edit_compression_ratio").find("option:selected").text();
+
+        var url="/addMonitorCamera"
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                cameraId:cameraId,
+                vedioFps:vedioFps,
+                compressionRatio:compressionRatio,
+                colorMin:colorMin,
+                colorMax:colorMax,
+                deviceIds:editSelectDevice
+            },
+            dataType: "json",
+            traditional: true,
+            success: function (result)
+            {
+                if(result!=null){
+                    $(".edit_result_div").css("display","block")
+                    if(result.status=="0"){
+                        $(".edit_result_div").css("color","#2edd57");
+                    }else{
+                        $(".edit_result_div").css("color","#ff0000");
+                    }
+                    $(".edit_result_div").text(result.message)
+                    timeout("edit_result_div")
+                    //获取data
+                    getMCam();
+                }
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
             }
         })
 
@@ -776,7 +1115,7 @@
         })
 
 
-        
+
     })
     $(".btn-cam-close").click(function () {
         $(".dialog_admin_overlay").hide();
@@ -817,14 +1156,73 @@
     })
     $(".output_device_manaement").click(function () {
         $(".dialog_admin_overlay").show();
+        $(".dialog_output_device_management").css("display", "block");
+        setTimeout(
+            "$('.dialog_output_device_management').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+            50
+        );
+        //发送请求获取输出设备的列表
+        getOutputList();
+    })
+
+    $(".btn-add-output-device").click(function () {
+        $(".dialog_add_simple_cam_overlay").show();
         $(".dialog_add_output_device").css("display", "block");
         setTimeout(
             "$('.dialog_add_output_device').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
             50
         );
     })
+    function getOutputList(){
+        var url="/findAllOutput"
+        $.ajax({
+            type: "post",
+            url: url,
+            success: function (result) {
+                if(result!= null){
+                    var result = eval(result);
+                    var table_html = "";
+
+                    $.each(result,function(i,obj) {
+                        table_html +="<tr ><td width=\"150\">"+obj.name+"</td><td>"+obj.clubId+"</td><td><a href=\"#\" class=\"edit_outputdevice\"><em></em>Edit</a></td><td><a href=\"#\" class=\"delete_outputdevice\" onclick=\"deleteOutput('"+obj.deviceId+"')\"><em></em>Delete</a></td></tr>"
+                    });
+                    $("#output_device_list").html(table_html);
+                    //显示弹出框
+
+                }
+
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
+            }
+        })
+    }
+
+    function deleteOutput(deviceId){
+        var url = "/deleteOutput"
+        $.ajax({
+            type: "post",
+            url: url,
+            data: {
+                deviceId:deviceId
+            },
+            dataType: "json",
+            success: function (result) {
+                if(result.status=="0"){
+                    getOutputList();
+                }else{
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $(".c_error_div").css("display","block");
+            }
+
+
+        })
+    }
     $(".btn-add-output-device-close").click(function () {
-        $(".dialog_admin_overlay").hide();
+        $(".dialog_add_simple_cam_overlay").hide();
         $(".dialog_add_output_device").css({
             opacity: "0",
             "-webkit-transform": "scale(0)",
@@ -913,24 +1311,29 @@
     })
 
     $(".btn_add_output_device").click(function () {
-        var name=$("#output_device_name").val()
+        var name=$("#output_device_name").val();
+        var clubId=$("#output_club_id").val();
         var url="/addOutputDevice";
         $.ajax({
             type: "post",
             url: url,
             data: {
                 name:name,
+                clubId:clubId
             },
             dataType: "json",
             success: function (result) {
                 $(".a_d_error_div").css("display","block")
                 if(result.status=="0"){
                     $(".a_d_error_div").css("color","#2edd57");
+                    //刷新list
+                    getOutputList();
                 }else{
                     $(".a_d_error_div").css("color","#ff0000");
                 }
                 $(".a_d_error_div").text(result.message)
                 timeout("a_d_error_div");
+
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 $(".a_d_error_div").css("display","block");
@@ -972,8 +1375,136 @@
                 timeout("a_simple_cam_error_div");
             }
         })
+
+    })
+
+    $(".btn-output-device-close").click(function () {
+        $(".dialog_admin_overlay").hide();
+        $(".dialog_output_device_management").css({
+            opacity: "0",
+            "-webkit-transform": "scale(0)",
+            display: "none"
+        });
+
+    })
+
+    var output_device_is_show=false;
+    var edit_output_device_is_show=false;
+    $(".edit-show-output-device-list").click(function () {
+        if(edit_output_device_is_show){
+            $(".edit-output-device-list-div").css("display","none");
+        }else{
+            $(".edit-output-device-list-div").css("display","block");
+        }
+        edit_output_device_is_show=!edit_output_device_is_show;
+    })
+    $(".show-output-device-list").click(function () {
+        var cameraId=$("#select_camera_id").find("option:selected").text();
+        var clubId=cameraId.split("_")[0];
+        //发送请求获取outputDevice
+        var url="/findOutputByClubId"
+        $.ajax({
+            type: "post",
+            url: url,
+            data:{
+                clubId:clubId
+            },
+            dataType: "json",
+            success: function (result) {
+                if(result!= null){
+                    var result = eval(result);
+                    var table_html = "";
+
+                    $.each(result,function(i,obj) {
+                        table_html +="<li>"+obj.name+"<input type=\"checkbox\" onclick=\"addOutputDevice(this,'"+obj.deviceId+"')\" ></li>";
+                    });
+                    $(".output-device-list").html(table_html);
+                    //显示弹出框
+
+                }
+
+            },
+            error:function (XMLHttpRequest, textStatus, errorThrown)
+            {
+
+            }
+        })
+
+
+
+        if(output_device_is_show){
+            $(".output-device-list-div").css("display","none");
+        }else{
+            $(".output-device-list-div").css("display","block");
+        }
+        output_device_is_show=!output_device_is_show;
+
+    })
+
+    var selectDevice=[];
+    function addOutputDevice(checkBox,deviceId) {
+        if(checkBox.checked){
+            selectDevice.push(deviceId);
+        }else {
+            var index = selectDevice.indexOf(deviceId);
+            if (index >= 0) {
+                selectDevice.splice(index, 1);
+            }
+        }
+    }
+    var editSelectDevice=[];
+    function editOutputDevice(checkBox,deviceId) {
+        if(checkBox.checked){
+            editSelectDevice.push(deviceId);
+        }else {
+            var index = editSelectDevice.indexOf(deviceId);
+            if (index >= 0) {
+                editSelectDevice.splice(index, 1);
+            }
+        }
+    }
+    $(".search_club").click(function () {
+        getData();
         
     })
+
+
+    function showImage(image) {
+        $(".dialog_overlay").show();
+        $(".dialog_show_image").css("display", "block");
+        setTimeout(
+            "$('.dialog_show_image').css({'opacity':'1', '-webkit-transform':'scale(1)'})",
+            50
+        );
+        $(".image_big").attr("src",image);
+    }
+
+    $(".btn-image-close").click(function () {
+        $(".dialog_overlay").hide();
+        $(".dialog_show_image").css({
+            opacity: "0",
+            "-webkit-transform": "scale(0)",
+            display: "none"
+        });
+
+    })
+
+    function formatStamp(stamp)
+    {
+        stamp=parseInt(stamp);
+        var time = new Date(stamp);
+        var y = time.getFullYear();
+        var m = time.getMonth()+1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+    }
+    function add0(m){return m<10?'0'+m:m }
+
+
+
 
 
 </script>

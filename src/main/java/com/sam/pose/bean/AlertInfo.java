@@ -26,9 +26,10 @@ public class AlertInfo implements Serializable {
     @PartitionKey
     private String partitionId;
     private String cameraId;
-    private String storeId;
+    private String clubId;
     private String image;
     private String time;
+    private String key;
 
 
 
@@ -39,7 +40,7 @@ public class AlertInfo implements Serializable {
                 "alertId='" + alertId + '\'' +
                 ", partitionId='" + partitionId + '\'' +
                 ", cameraId='" + cameraId + '\'' +
-                ", storeId='" + storeId + '\'' +
+                ", clubId='" + clubId + '\'' +
                 ", time='" + time + '\'' +
                 '}';
     }

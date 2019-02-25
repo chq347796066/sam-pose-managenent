@@ -3,6 +3,7 @@ package com.sam.pose.controller;
 import com.sam.pose.bean.*;
 import com.sam.pose.dao.AlertInfoRepository;
 import com.sam.pose.dao.ClubInfoRepository;
+import com.sam.pose.dao.RuleInfoRepository;
 import com.sam.pose.parameter.SettingBean;
 import com.sam.pose.server.CameraSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,14 @@ public class HomeController {
     @Autowired
     private CameraSettingService cameraSettingService;
 
+    @Autowired
+    private RuleInfoRepository ruleInfoRepository;
+
 
     @RequestMapping("/home")
-    public String home(Model model){
+    public String home(){
         return "ListPage";
     }
-
-
-
-
-
-
-
-
-
 
 
     @RequestMapping(value = "/setting",method = RequestMethod.POST)
@@ -61,6 +56,9 @@ public class HomeController {
     public String pose(){
         return "openpose";
     }
+
+
+
 
 
 

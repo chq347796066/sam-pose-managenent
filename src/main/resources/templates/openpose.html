@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -135,14 +135,15 @@
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-        var host = "ws://127.0.0.1:8081/"
+        var host = "ws://13.90.207.222:40497/"
         socket = new WebSocket(host);
         try {
 
             socket.onopen = function (msg) {
+                //alert("连接成功！");
               console.log("连接成功！")
-                //向服务端发送消息
-              //socket.send("message")
+              data = {"clubId":6372,"cameraId":111}
+              socket.send(JSON.stringify(data))
                 
             };
 
@@ -152,9 +153,18 @@
                     if (obj.type== 1)
                       $("#image").attr("src",obj.image);
                     if (obj.type== 2){
-                       console.log(obj);
-                       var html = "<img style='margin:1px;' src='" + obj.image + " ' width='214px' height='120px'/>";
-                       $("#showImage").append(html);
+                       //console.log(obj);
+                        console.log(obj.key)
+
+                        findAlertInfo(obj.key)
+
+
+
+
+                       //
+                       // var html = "<img style='margin:1px;' src='" + obj.image + " ' width='214px' height='120px'/>";
+                       // $("#showImage").append(html);
+
                     }
                       
                 }
@@ -165,19 +175,43 @@
 
             socket.onclose = function (msg) { 
               console.log("socket closed!") 
-              //window.location.reload();
+              window.location.reload();
             };
         }
         catch (ex) {
             console.log(ex);
         }
         });
+        
+        function findAlertInfo(key) {
+            var url="/findAlertByKey";
+            $.ajax({
+                type: "post",
+                url: url,
+                data:{
+                    key:key
+                },
+                dataType:"json",
+                success: function (result) {
+                    if(result!= null){
+                        var result = eval(result);
+                        var html =" <div style=\"float: left\"><img style=\"width: 214px;height: 120px;margin-left: 10px\" class=\"alert_image\" src='"+result.image+"'><div style=\"text-align: center\">"+result.time+"</div></div>";
+                        $("#showImage").append(html);
+                    }
+                },
+                error:function (XMLHttpRequest, textStatus, errorThrown)
+                {
+
+                }
+            })
+            
+        }
     </script>
 <body>
   <div class="header-box">
 	<div class="logo-box">
 	  <a href="#">
-	    <img src="head.png" alt="" />
+	    <img src="../front/images/head.png" alt="" />
 	  </a>
 	</div>
   </div>
@@ -196,9 +230,20 @@
   </aside>
   <section class="result">
 	<div class="result-wrapper">
+		
 		<div class="img-container">
-			<div class="boxes" style="margin:20px;overflow-y:scroll; overflow-x:scroll;height: 100%;" id="showImage" >
+		  
+            <div class="boxes" style="margin:20px;overflow-y:scroll; overflow-x:scroll;height: 100%;" id="showImage" >
+                <!--<div style="float: left;margin-left: 10px;">-->
+                    <!--<img style="width: 214px;height: 120px" class="alert_image" src="../front/images/demo.jpg">-->
+                    <!--<div style="text-align: center">time</div>-->
+                <!--</div>-->
+
+
+            </div>
+        
       </div>
+		  
     </div>
   </section>
   <footer class="footer"><p class="powered">Powered by ProductAI®</p></footer>
